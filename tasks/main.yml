@@ -1,37 +1,41 @@
 ---
-- name: ensure the ~/src-hub directory is present
-  file: path=/home/{{ username }}/src-hub
-        state=directory
+- name: Printing the environment​ variable in Ansible
+  debug:
+    msg: "{{ lookup('env','USER') }}"
+  register: username
 
 - name: clone oh-my-zsh
   git: repo=https://github.com/robbyrussell/oh-my-zsh.git
-       dest=/home/{{ username }}/.oh-my-zsh
+       dest=~/.oh-my-zsh
        update=no
 
-#- name: clone dircolors-solarized plugin
-#  git: repo=https://github.com/joel-porquet/zsh-dircolors-solarized
-#       dest=/home/{{ username }}/src-hub/oh-my-zsh/custom/plugins
-
-#- name: create symlink to oh-my-zsh
-#  file: path=/home/{{ username }}/.oh-my-zsh
-#        src=/home/{{ username }}/src-hub/oh-my-zsh
-#        state=link
-
 - name: check if .zshrc exists
-  stat: path=/home/{{ username }}/.zshrc
+  stat: path=~/.zshrc
   register: zshrc
 
-- name: back up existing .zshrc file if it exists
-  when: zshrc.stat.exists
-  copy: src=/home/{{ username }}/.zshrc
-        dest=/home/{{ username }}/.zshrc-orig
+#- name: back up existing .zshrc file if it exists
+#  copy: src=~/.zshrc
+#        dest=~/.zshrc-orig
+  #when: zshrc.stat.exists
 
+#Run only when the has been changed 
 - name: copy zshrc to user home
-  copy: src=zshrc
-        dest=/home/{{ username }}/.zshrc
+  copy: src=".zshrc"
+        dest=~/
         force=yes
+        backup=yes
+  #when: zshrc.stat.exists
+       
+
+- name: Validating the current shell
+  shell: echo $SHELL
+  register: isSHELL
+
+- debug: 
+    msg: "The Current Shell is: {{ isSHELL.stdout }}"
 
 - name: change user shell to zsh
   become: yes
   become_user: root
-  command: chsh -s /bin/zsh "{{ username }}"
+  command: chsh -s /bin/zsh "{{ lookup('env','USER') }}"
+  changed_when: isSHELL.stdout.find("/bin/zsh")|bool == false
