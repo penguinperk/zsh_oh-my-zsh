@@ -96,3 +96,8 @@ source $ZSH/oh-my-zsh.sh
 
 ## Enabling to start Visual Studio code 
 code () { VSCODE_CWD="$PWD" open -n -b "com.microsoft.VSCode" --args $* ;}
+
+##
+#changed Locale for for vimrc file
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
