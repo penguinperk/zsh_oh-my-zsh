@@ -24,8 +24,7 @@
         dest=~/
         force=yes
         backup=yes
-  #when: zshrc.stat.exists
-       
+  when: not zshrc.stat.exists
 
 - name: Validating the current shell
   shell: echo $SHELL
