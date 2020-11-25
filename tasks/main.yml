@@ -13,12 +13,7 @@
   stat: path=~/.zshrc
   register: zshrc
 
-#- name: back up existing .zshrc file if it exists
-#  copy: src=~/.zshrc
-#        dest=~/.zshrc-orig
-  #when: zshrc.stat.exists
-
-#Run only when the has been changed 
+# Run only when the has been changed
 - name: copy zshrc to user home
   copy: src=".zshrc"
         dest=~/
@@ -30,11 +25,11 @@
   shell: echo $SHELL
   register: isSHELL
 
-- debug: 
+- debug:
     msg: "The Current Shell is: {{ isSHELL.stdout }}"
 
 - name: change user shell to zsh
-  become: yes
+  become: true
   become_user: root
   command: chsh -s /bin/zsh "{{ lookup('env','USER') }}"
   changed_when: isSHELL.stdout.find("/bin/zsh")|bool == false
